@@ -1,0 +1,16 @@
+{
+  "name": "laurestaurant",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "node --env-file=.env api/index.js",
+    "init-db": "node --env-file=.env scripts/init-db.js"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.0",
+    "bcryptjs": "^2.4.3",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "engines": { "node": ">=20" }
+}

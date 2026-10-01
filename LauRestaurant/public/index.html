@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LauRestaurant</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Bitter:wght@600;800&display=swap">
+<style>
+:root{--ember:#b3201a;--chili:#e4572e;--broth:#f2a93b;--coal:#241210;--paper:#fbf1ec;--ok:#2f855a;--line:#e6d3ca}
+*{box-sizing:border-box}
+body{margin:0;font:15px/1.5 'Be Vietnam Pro',sans-serif;background:var(--paper);color:var(--coal)}
+h1,h2,h3,.brand{font-family:Bitter,serif}
+header{display:flex;align-items:center;gap:16px;padding:10px 20px;background:var(--coal);color:#fff;flex-wrap:wrap;position:sticky;top:0;z-index:5}
+.brand{font-size:22px;font-weight:800;color:var(--broth);cursor:pointer}
+#nav{display:flex;gap:4px;flex:1;flex-wrap:wrap}
+#nav a{padding:6px 12px;border-radius:6px;color:#f3d9cf;cursor:pointer}
+#nav a.on,#nav a:hover{background:var(--ember);color:#fff}
+button{font:inherit;padding:6px 14px;border:0;border-radius:6px;background:var(--ember);color:#fff;cursor:pointer;margin:2px}
+button:hover{background:var(--chili)}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--broth)}
+button.alt{background:#fff;color:var(--coal);border:1px solid var(--line)}
+main{max-width:1100px;margin:0 auto;padding:20px}
+.hero{background:linear-gradient(135deg,#7a1410,var(--chili));color:#fff;border-radius:12px;padding:36px 28px;margin-bottom:20px}
+.hero h1{margin:0 0 6px;font-size:34px}.hero p{margin:0;opacity:.9}
+.bar,.row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+input,select{font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;min-width:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.card,.ticket,.stat{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px}
+.card small{color:#8a6a5e;display:block}.card p{margin:6px 0;color:#5b4339}.price{font-weight:600;color:var(--ember)}
+.card.off{opacity:.5}
+.tbl{border-radius:10px;padding:14px;color:#fff;cursor:pointer;min-height:84px}
+.tbl small,.tbl em{display:block;font-style:normal;opacity:.95}
+.tbl.empty{background:var(--ok)}.tbl.occupied{background:var(--ember)}.tbl.reserved{background:var(--broth);color:var(--coal)}.tbl.cleaning{background:#5b6b7a}
+table{width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;margin:8px 0 18px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left}th{background:#f6e3da}
+tr.low td{background:#fde4df;color:#8f1a14}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:20px}@media(max-width:700px){.cols{grid-template-columns:1fr}}
+.ticket{margin-bottom:10px;border-left:6px solid var(--chili)}.ticket p{margin:4px 0}
+.chk{display:block;padding:4px 0}
+.stat b{display:block;font:800 26px Bitter,serif;color:var(--ember)}
+dialog{border:0;border-radius:12px;padding:20px;max-width:560px;width:92%}
+dialog::backdrop{background:#241210aa}
+label{display:block;margin:8px 0}label input,label select{display:block;width:100%}
+@media print{body>*:not(dialog){display:none}dialog button,dialog select,dialog .row{display:none}dialog::backdrop{background:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand" onclick="start()">🍲 LauRestaurant</div>
+  <div id="nav"></div>
+  <button id="auth" onclick="authBtn()">Đăng nhập nhân viên</button>
+</header>
+<main id="main"></main>
+<dialog id="dlg"></dialog>
+
+<script>
+const $ = s => document.querySelector(s), dlg = $('#dlg');
+const money = n => Number(n || 0).toLocaleString('vi-VN') + 'đ';
+const today = () => new Date().toLocaleDateString('sv');
+let token = localStorage.token, me = JSON.parse(localStorage.me || 'null'), timer;
+const DATA = {};
+const ST = { empty: 'Trống', occupied: 'Có khách', reserved: 'Đã đặt', cleaning: 'Cần dọn' };
+const IST = { pending: 'Chờ bếp', cooking: 'Đang nấu', done: 'Món xong', served: 'Đã phục vụ' };
+const ROLE = { admin: 'Quản trị', waiter: 'Phục vụ', kitchen: 'Bếp', cashier: 'Thu ngân' };
+const PAGE_NAME = { tables: 'Sơ đồ bàn', resv: 'Đặt bàn', kitchen: 'Bếp', pay: 'Thanh toán', inv: 'Hóa đơn', ing: 'Kho', users: 'Người dùng', areas: 'Khu vực & bàn', menu: 'Thực đơn', rep: 'Báo cáo' };
+const NAV = {
+  admin: ['rep', 'tables', 'kitchen', 'pay', 'resv', 'inv', 'menu', 'areas', 'ing', 'users'],
+  waiter: ['tables', 'resv'], kitchen: ['kitchen', 'ing'], cashier: ['pay', 'inv']
+};
+
+async function api(p, m = 'GET', b) {
+  const r = await fetch('/api/' + p, { method: m, headers: { 'Content-Type': 'application/json', ...(token && { Authorization: 'Bearer ' + token }) }, body: b && JSON.stringify(b) });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) { alert(d.error || 'Có lỗi xảy ra'); if (r.status === 401 && me) logout(); throw d; }
+  return d;
+}
+
+/* ---------- Trang chủ công khai: tìm kiếm & lọc món (PB06) ---------- */
+async function home() {
+  clearInterval(timer);
+  const cats = await api('categories');
+  $('#main').innerHTML = `<section class="hero"><h1>Lẩu nóng, quây quần</h1><p>Chọn nồi lẩu và món nhúng bạn thích.</p></section>
+    <div class="bar"><input id="q" placeholder="Tìm món ăn" oninput="loadMenu()"><select id="cat" onchange="loadMenu()"><option value="">Tất cả danh mục</option>${cats.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}</select></div>
+    <div id="grid" class="grid"></div>`;
+  loadMenu();
+}
+async function loadMenu() {
+  const m = await api(`menu?q=${encodeURIComponent($('#q').value)}&category=${$('#cat').value}`);
+  $('#grid').innerHTML = m.map(i => `<div class="card ${i.available ? '' : 'off'}"><b>${i.name}</b><small>${i.category_name || ''}</small><p>${i.description || ''}</p><div class="price">${money(i.price)}${i.available ? '' : ' · Hết món'}</div></div>`).join('') || '<p>Không có món nào khớp với tìm kiếm.</p>';
+}
+
+/* ---------- Đăng nhập / điều hướng ---------- */
+function authBtn() {
+  if (me) return logout();
+  dlg.innerHTML = `<form onsubmit="return login(event)"><h3>Đăng nhập nhân viên</h3><label>Tên đăng nhập<input name="u" autofocus></label><label>Mật khẩu<input name="p" type="password"></label><div class="row"><button>Đăng nhập</button><button type="button" class="alt" onclick="dlg.close()">Hủy</button></div></form>`;
+  dlg.showModal();
+}
+async function login(e) {
+  e.preventDefault();
+  const d = await api('auth/login', 'POST', { username: e.target.u.value, password: e.target.p.value });
+  token = localStorage.token = d.token; me = d.user; localStorage.me = JSON.stringify(me);
+  dlg.close(); start(); return false;
+}
+function logout() { localStorage.clear(); token = me = null; start(); }
+function start() {
+  clearInterval(timer);
+  $('#auth').textContent = me ? `Đăng xuất (${me.name})` : 'Đăng nhập nhân viên';
+  $('#nav').innerHTML = me ? NAV[me.role].map(k => `<a data-k="${k}" onclick="go('${k}')">${PAGE_NAME[k]}</a>`).join('') : '';
+  me ? go(NAV[me.role][0]) : home();
+}
+async function go(k) {
+  clearInterval(timer);
+  document.querySelectorAll('#nav a').forEach(a => a.classList.toggle('on', a.dataset.k === k));
+  $('#main').innerHTML = '<div id="page"></div>';
+  await PAGES[k]();
+}
+
+/* ---------- CRUD dùng chung (người dùng, khu vực, bàn, thực đơn, kho) ---------- */
+const CRUD = {
+  users: { t: 'Tài khoản', ep: 'users', c: [['username', 'Tên đăng nhập'], ['full_name', 'Họ tên'], ['role', 'Vai trò']],
+    f: [{ k: 'username', l: 'Tên đăng nhập' }, { k: 'full_name', l: 'Họ tên' }, { k: 'role', l: 'Vai trò', o: Object.entries(ROLE) }, { k: 'password', l: 'Mật khẩu (bỏ trống nếu giữ nguyên)', t: 'password' }] },
+  areas: { t: 'Khu vực', ep: 'areas', c: [['name', 'Tên khu vực']], f: [{ k: 'name', l: 'Tên khu vực' }] },
+  tables: { t: 'Bàn ăn', ep: 'tables', c: [['name', 'Bàn'], ['area', 'Khu vực'], ['seats', 'Số chỗ']],
+    f: [{ k: 'area_id', l: 'Khu vực', o: 'areas' }, { k: 'name', l: 'Tên bàn' }, { k: 'seats', l: 'Số chỗ', t: 'number' }] },
+  cats: { t: 'Danh mục', ep: 'categories', c: [['name', 'Tên danh mục']], f: [{ k: 'name', l: 'Tên danh mục' }] },
+  menu: { t: 'Món ăn', ep: 'menu', c: [['name', 'Món'], ['category_name', 'Danh mục'], ['price', 'Giá'], ['available', 'Còn món']],
+    f: [{ k: 'category_id', l: 'Danh mục', o: 'categories' }, { k: 'name', l: 'Tên món' }, { k: 'price', l: 'Giá (đ)', t: 'number' }, { k: 'description', l: 'Mô tả' }, { k: 'available', l: 'Còn món', t: 'checkbox' }] },
+  ing: { t: 'Nguyên vật liệu', ep: 'ingredients', c: [['name', 'Tên'], ['unit', 'Đơn vị'], ['quantity', 'Tồn kho'], ['min_quantity', 'Mức cảnh báo']],
+    f: [{ k: 'name', l: 'Tên' }, { k: 'unit', l: 'Đơn vị' }, { k: 'quantity', l: 'Tồn kho', t: 'number' }, { k: 'min_quantity', l: 'Mức cảnh báo hết hàng', t: 'number' }],
+    extra: r => `<button class="alt" onclick="receipt(${r.id})">Nhập kho</button>` }
+};
+const fmt = (v, k) => v === true ? '✓' : v === false ? '✗' : k === 'price' ? money(v) : v ?? '';
+async function crud(key, el) {
+  const c = CRUD[key], rows = await api(c.ep), canEdit = me.role === 'admin';
+  DATA[key] = { rows, el };
+  el.innerHTML = `<h3>${c.t} ${canEdit ? `<button onclick="edit('${key}')">+ Thêm</button>` : ''}</h3><table><tr>${c.c.map(x => `<th>${x[1]}</th>`).join('')}<th></th></tr>
+    ${rows.map(r => `<tr class="${r.min_quantity != null && +r.quantity <= +r.min_quantity ? 'low' : ''}">${c.c.map(x => `<td>${fmt(r[x[0]], x[0])}</td>`).join('')}
+    <td>${canEdit ? (c.extra ? c.extra(r) : '') + `<button class="alt" onclick="edit('${key}',${r.id})">Sửa</button><button class="alt" onclick="del('${key}',${r.id})">Xóa</button>` : ''}</td></tr>`).join('')}</table>`;
+}
+const reload = k => crud(k, DATA[k].el);
+async function edit(key, id) {
+  const c = CRUD[key], r = id ? DATA[key].rows.find(x => x.id == id) : {};
+  const fields = await Promise.all(c.f.map(async f => ({ ...f, o: typeof f.o === 'string' ? (await api(f.o)).map(x => [x.id, x.name]) : f.o })));
+  dlg.innerHTML = `<form onsubmit="return save(event,'${key}',${id || 0})"><h3>${id ? 'Sửa' : 'Thêm'} ${c.t.toLowerCase()}</h3>${fields.map(f => `<label>${f.l}${
+    f.o ? `<select name="${f.k}">${f.o.map(([v, l]) => `<option value="${v}" ${v == r[f.k] ? 'selected' : ''}>${l}</option>`).join('')}</select>`
+    : f.t === 'checkbox' ? `<input type="checkbox" name="${f.k}" ${r[f.k] !== false ? 'checked' : ''}>`
+    : `<input name="${f.k}" type="${f.t || 'text'}" value="${f.t === 'password' ? '' : r[f.k] ?? ''}">`}</label>`).join('')}
+    <div class="row"><button>Lưu</button><button type="button" class="alt" onclick="dlg.close()">Hủy</button></div></form>`;
+  dlg.showModal();
+}
+async function save(e, key, id) {
+  e.preventDefault(); const c = CRUD[key], b = {};
+  for (const f of c.f) {
+    const el = e.target.elements[f.k];
+    if (f.t === 'checkbox') b[f.k] = el.checked; else if (f.t === 'number') b[f.k] = +el.value; else if (el.value || f.t !== 'password') b[f.k] = el.value;
+  }
+  await api(c.ep + (id ? '/' + id : ''), id ? 'PUT' : 'POST', b); dlg.close(); reload(key); return false;
+}
+async function del(key, id) { if (confirm('Bạn chắc chắn muốn xóa?')) { await api(CRUD[key].ep + '/' + id, 'DELETE'); reload(key); } }
+async function receipt(id) {
+  const n = prompt('Số lượng nhập kho:'); if (+n > 0) { await api(`ingredients/${id}/receipt`, 'POST', { quantity: +n }); reload('ing'); }
+}
+
+/* ---------- Các trang chức năng ---------- */
+const PAGES = {
+  async users() { crud('users', $('#page')); },
+  async areas() { $('#page').innerHTML = '<h2>Khu vực & bàn ăn</h2><div id="a"></div><div id="t"></div>'; await crud('areas', $('#a')); await crud('tables', $('#t')); },
+  async menu() { $('#page').innerHTML = '<h2>Thực đơn</h2><div id="a"></div><div id="t"></div>'; await crud('cats', $('#a')); await crud('menu', $('#t')); },
+  async ing() { $('#page').innerHTML = '<h2>Kho nguyên vật liệu</h2><p>Dòng đỏ là nguyên liệu sắp hết, cần nhập thêm.</p><div id="a"></div>'; crud('ing', $('#a')); },
+
+  async tables() { // PB07 + PB10 (dọn bàn)
+    const render = async () => {
+      const [areas, tabs, open] = await Promise.all([api('areas'), api('tables'), api('orders/open')]);
+      $('#page').innerHTML = '<h2>Sơ đồ bàn</h2>' + areas.map(a => `<h3>${a.name}</h3><div class="grid">${tabs.filter(t => t.area_id == a.id).map(t => {
+        const o = open.find(o => o.table_id == t.id);
+        return `<div class="tbl ${t.status}" onclick="tableClick(${t.id},'${t.status}',${o ? o.id : 0})"><b>${t.name}</b><small>${t.seats} chỗ · ${ST[t.status]}</small>${o && o.ready ? `<em>${o.ready} món chờ phục vụ</em>` : ''}</div>`;
+      }).join('')}</div>`).join('');
+    };
+    await render(); timer = setInterval(render, 10000);
+  },
+  async kitchen() { // PB08 + PB14 (bếp bật "hết món")
+    const render = async () => {
+      const [k, m] = await Promise.all([api('kitchen'), api('menu')]);
+      $('#page').innerHTML = `<h2>Bếp</h2><div class="cols"><div><h3>Món cần chế biến (cũ nhất trước)</h3>${k.map(i => `<div class="ticket"><b>${i.quantity}× ${i.name}</b><p>${i.table_name} · ${new Date(i.created_at).toLocaleTimeString('vi-VN')} · ${IST[i.status]}</p>${i.note ? `<p>Ghi chú: ${i.note}</p>` : ''}
+        <button onclick="setItem(${i.id},'${i.status === 'pending' ? 'cooking' : 'done'}')">${i.status === 'pending' ? 'Bắt đầu nấu' : 'Hoàn thành, báo phục vụ'}</button></div>`).join('') || '<p>Chưa có món nào chờ.</p>'}</div>
+        <div><h3>Tình trạng món (bỏ tick = hết món)</h3>${m.map(i => `<label class="chk"><input type="checkbox" style="display:inline;width:auto" ${i.available ? 'checked' : ''} onchange="avail(${i.id},this.checked)"> ${i.name}</label>`).join('')}</div></div>`;
+    };
+    await render(); timer = setInterval(render, 10000);
+  },
+  async pay() { // PB09 + PB10
+    const o = await api('orders/open');
+    $('#page').innerHTML = '<h2>Thanh toán</h2><div class="grid">' + (o.map(x => `<div class="tbl occupied" onclick="invoiceDlg(${x.id})"><b>${x.table_name}</b><small>${money(x.total)}</small></div>`).join('') || '<p>Chưa có bàn nào cần thanh toán.</p>') + '</div>';
+  },
+  async inv() { // PB11
+    $('#page').innerHTML = `<h2>Lịch sử hóa đơn</h2><div class="bar"><input type="date" id="d" onchange="loadInv()"><input id="cd" placeholder="Mã hóa đơn" oninput="loadInv()"></div><div id="list"></div>`; loadInv();
+  },
+  async rep() { // PB12
+    $('#page').innerHTML = `<h2>Báo cáo doanh thu</h2><div class="bar"><input type="date" id="d" value="${today()}" onchange="loadRep()"></div><div id="list"></div>`; loadRep();
+  },
+  async resv() { // PB13
+    const tabs = (await api('tables')).filter(t => t.status === 'empty');
+    $('#page').innerHTML = `<h2>Đặt bàn trước</h2><div class="bar"><input id="rn" placeholder="Tên khách"><input id="rp" placeholder="Số điện thoại"><input id="rs" type="number" min="1" value="2" style="width:80px"><input id="rt" type="datetime-local"><input id="rd" type="number" placeholder="Tiền cọc" style="width:120px">
+      <select id="rb"><option value="">Chưa chọn bàn</option>${tabs.map(t => `<option value="${t.id}">${t.name}</option>`).join('')}</select><button onclick="addResv()">Nhận đặt bàn</button></div><div id="list"></div>`; loadResv();
+  }
+};
+
+/* ---------- Hàm hỗ trợ cho các trang ---------- */
+async function tableClick(id, st, oid) {
+  if (st === 'cleaning') { await api(`tables/${id}/status`, 'PUT', { status: 'empty' }); return go('tables'); }
+  if (!oid) { if (!confirm('Mở bàn và tạo order mới?')) return; oid = (await api('orders', 'POST', { table_id: id })).id; go('tables'); }
+  orderDlg(oid);
+}
+async function orderDlg(oid) {
+  const [o, menu] = await Promise.all([api('orders/' + oid), api('menu')]);
+  dlg.innerHTML = `<h3>${o.table_name} · Order #${o.id}</h3><table><tr><th>Món</th><th>SL</th><th>Trạng thái</th><th></th></tr>${o.items.map(i => `<tr><td>${i.name}${i.note ? `<br><small>${i.note}</small>` : ''}</td><td>${i.quantity}</td><td>${IST[i.status]}</td>
+    <td>${i.status === 'done' ? `<button onclick="setItem(${i.id},'served',${oid})">Đã mang ra</button>` : ''}</td></tr>`).join('') || '<tr><td colspan="4">Chưa có món nào.</td></tr>'}</table>
+    <b>Tổng: ${money(o.total)}</b>
+    <div class="row"><select id="mi">${menu.filter(m => m.available).map(m => `<option value="${m.id}">${m.name} · ${money(m.price)}</option>`).join('')}</select><input id="qt" type="number" min="1" value="1" style="width:70px"><input id="nt" placeholder="Ghi chú"><button onclick="addItem(${oid})">Thêm món</button></div>
+    <div class="row">${o.items.length ? '' : `<button class="alt" onclick="cancelOrder(${oid})">Hủy order</button>`}<button class="alt" onclick="dlg.close();go('tables')">Đóng</button></div>`;
+  if (!dlg.open) dlg.showModal();
+}
+async function addItem(oid) { await api(`orders/${oid}/items`, 'POST', { menu_item_id: $('#mi').value, quantity: +$('#qt').value, note: $('#nt').value }); orderDlg(oid); }
+async function cancelOrder(oid) { await api('orders/' + oid, 'DELETE'); dlg.close(); go('tables'); }
+async function setItem(id, status, oid) { await api(`order-items/${id}/status`, 'PUT', { status }); oid ? orderDlg(oid) : go('kitchen'); }
+async function avail(id, v) { await api(`menu/${id}/availability`, 'PUT', { available: v }); }
+
+async function invoiceDlg(oid) {
+  const o = await api('orders/' + oid);
+  dlg.innerHTML = `<div id="bill"><h3>🍲 LauRestaurant</h3><p>${o.table_name} · ${new Date().toLocaleString('vi-VN')}</p><table><tr><th>Món</th><th>SL</th><th>Đơn giá</th><th>Thành tiền</th></tr>
+    ${o.items.map(i => `<tr><td>${i.name}</td><td>${i.quantity}</td><td>${money(i.price)}</td><td>${money(i.price * i.quantity)}</td></tr>`).join('')}</table><h3>Tổng cộng: ${money(o.total)}</h3></div>
+    <div class="row"><select id="pm"><option value="cash">Tiền mặt</option><option value="transfer">Chuyển khoản</option></select><button onclick="pay(${oid})">Thanh toán & đóng bàn</button><button class="alt" onclick="window.print()">In hóa đơn</button><button class="alt" onclick="dlg.close()">Đóng</button></div>`;
+  dlg.showModal();
+}
+async function pay(oid) { const inv = await api(`orders/${oid}/pay`, 'POST', { method: $('#pm').value }); alert('Thanh toán thành công. Mã hóa đơn: ' + inv.code); dlg.close(); go('pay'); }
+
+async function loadInv() {
+  const r = await api(`invoices?date=${$('#d').value}&code=${encodeURIComponent($('#cd').value)}`);
+  $('#list').innerHTML = `<table><tr><th>Mã</th><th>Bàn</th><th>Tổng tiền</th><th>Hình thức</th><th>Thời gian</th></tr>${r.map(i => `<tr><td>${i.code}</td><td>${i.table_name}</td><td>${money(i.total)}</td><td>${i.method === 'cash' ? 'Tiền mặt' : 'Chuyển khoản'}</td><td>${new Date(i.paid_at).toLocaleString('vi-VN')}</td></tr>`).join('') || '<tr><td colspan="5">Không có hóa đơn.</td></tr>'}</table>`;
+}
+async function loadRep() {
+  const r = await api('reports?date=' + $('#d').value);
+  $('#list').innerHTML = `<div class="grid"><div class="stat"><b>${money(r.revenue)}</b>Doanh thu</div><div class="stat"><b>${r.tables_served}</b>Lượt bàn phục vụ</div><div class="stat"><b>${r.orders}</b>Số đơn</div></div>
+    <h3>Món bán chạy</h3><table><tr><th>Hạng</th><th>Món</th><th>Số lượng</th></tr>${r.top.map((t, i) => `<tr><td>${i + 1}</td><td>${t.name}</td><td>${t.qty}</td></tr>`).join('') || '<tr><td colspan="3">Chưa có dữ liệu.</td></tr>'}</table>`;
+}
+async function addResv() {
+  if (!$('#rt').value) return alert('Vui lòng chọn thời gian đặt');
+  await api('reservations', 'POST', { customer_name: $('#rn').value, phone: $('#rp').value, party_size: +$('#rs').value, reserved_at: new Date($('#rt').value).toISOString(), deposit: +$('#rd').value, table_id: $('#rb').value || null });
+  go('resv');
+}
+async function loadResv() {
+  const r = await api('reservations');
+  $('#list').innerHTML = `<table><tr><th>Khách</th><th>SĐT</th><th>Số người</th><th>Giờ đặt</th><th>Cọc</th><th>Bàn</th><th>Trạng thái</th><th></th></tr>${r.map(x => `<tr><td>${x.customer_name}</td><td>${x.phone}</td><td>${x.party_size}</td><td>${new Date(x.reserved_at).toLocaleString('vi-VN')}</td><td>${money(x.deposit)}</td><td>${x.table_name || ''}</td><td>${{ booked: 'Đã đặt', arrived: 'Đã đến', cancelled: 'Đã hủy' }[x.status]}</td>
+    <td>${x.status === 'booked' ? `<button onclick="resvStatus(${x.id},'arrived')">Khách đến</button><button class="alt" onclick="resvStatus(${x.id},'cancelled')">Hủy</button>` : ''}</td></tr>`).join('')}</table>`;
+}
+async function resvStatus(id, status) { await api(`reservations/${id}/status`, 'PUT', { status }); go('resv'); }
+
+start();
+</script>
+</body>
+</html>
