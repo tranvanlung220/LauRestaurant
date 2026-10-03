@@ -10,16 +10,59 @@
 *{box-sizing:border-box}
 body{margin:0;font:15px/1.5 'Be Vietnam Pro',sans-serif;background:var(--paper);color:var(--coal)}
 h1,h2,h3,.brand{font-family:Bitter,serif}
-header{display:flex;align-items:center;gap:16px;padding:10px 20px;background:var(--coal);color:#fff;flex-wrap:wrap;position:sticky;top:0;z-index:5}
+html{scroll-behavior:smooth}
+section[id]{scroll-margin-top:90px;margin:44px 0}
+header{display:flex;align-items:center;gap:16px;padding:12px 28px;background:linear-gradient(90deg,#1c0b09,#3a1410);color:#fff;flex-wrap:wrap;position:sticky;top:0;z-index:5;border-bottom:3px solid var(--ember)}
 .brand{font-size:22px;font-weight:800;color:var(--broth);cursor:pointer}
 #nav{display:flex;gap:4px;flex:1;flex-wrap:wrap}
 #nav a{padding:6px 12px;border-radius:6px;color:#f3d9cf;cursor:pointer}
 #nav a.on,#nav a:hover{background:var(--ember);color:#fff}
+#nav.pub{justify-content:flex-end;align-items:center;gap:6px}
+#nav.pub a{padding:8px 14px;border-radius:0;background:none;color:#fff;font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+#nav.pub a:hover,#nav.pub a.on{background:none;color:var(--broth)}
+button.book{background:transparent;border:2px solid var(--broth);color:#fff;border-radius:10px;padding:8px 22px;margin:0 0 0 12px;font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+button.book:hover{background:var(--broth);color:var(--coal)}
+button.gold{background:var(--broth);color:var(--coal);font-weight:600;padding:10px 22px;margin:14px 0 0}
+button.gold:hover{background:#ffd27a}
+@media(max-width:760px){#nav.pub a{padding:6px 8px;font-size:13px}button.book{padding:6px 12px;margin-left:4px}}
+.pic{height:150px;background-color:#e8cfc2;background-size:cover;background-position:center}
+.card .pic{margin:-14px -14px 10px;height:140px;border-radius:10px 10px 0 0}
+.panel{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.panel .pic{height:170px}.panel .body{padding:14px}.panel h3{margin:0 0 4px}.panel p{margin:4px 0;color:#5b4339}
+.contact{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:18px 28px;background:var(--coal);color:#d9bfb4}
+footer a{color:var(--broth);cursor:pointer}
+main.full{max-width:none;padding:0}
+.inner{max-width:1100px;margin:0 auto;padding:0 20px}
+.announce{background:var(--broth);color:var(--coal);text-align:center;padding:9px 44px;font-weight:600;text-transform:uppercase;font-size:13px;position:relative}
+.announce button{position:absolute;right:8px;top:2px;background:none;color:var(--coal);font-size:22px;padding:0 8px}
+.hotline{display:flex;flex-direction:column;border-left:1px solid #ffffff44;padding-left:14px;font-size:11px;line-height:1.2;letter-spacing:.08em}
+.hotline b{color:var(--broth);font-size:18px;letter-spacing:0}
+.pbanner{background:linear-gradient(135deg,#2a0f0c,#5c1712);color:#fff;padding:56px 0 40px}
+.pbanner .inner{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
+.pbanner h1{font-size:44px;color:var(--broth);margin:0 0 8px}.pbanner p{max-width:520px;margin:0;opacity:.9}
+.search{border-radius:30px;padding:11px 20px;min-width:260px;background:#ffffff14;border:1px solid #ffffff66;color:#fff}
+.search::placeholder{color:#ffffffaa}
+.tabs{background:var(--broth);display:flex;gap:6px;overflow-x:auto;padding:0 max(20px,calc(50% - 530px))}
+.tabs:empty{height:10px;padding:0}
+.tabs a{padding:14px 12px;font-weight:600;text-transform:uppercase;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;color:var(--coal)}
+.tabs a.on,.tabs a:hover{border-color:var(--ember)}
+.feature{display:grid;grid-template-columns:1.2fr 1fr;background:var(--coal);color:#fff;border-radius:12px;overflow:hidden;margin-bottom:18px}
+.feature .pic{height:100%;min-height:240px}.feature>div:last-child{padding:24px}.feature h2{color:var(--broth);margin:6px 0}
+.tile{background:#fff;border:1px solid var(--line);border-radius:10px;padding:18px;color:var(--coal);text-decoration:none;display:block}
+.tile b{font:800 18px Bitter,serif;color:var(--ember);display:block}.tile:hover{border-color:var(--chili)}
+.hero{margin:20px 0}
+.sec{border-left:4px solid var(--broth);padding-left:8px;font-weight:600;margin:16px 0 8px}
+.bk h2{color:var(--ember);margin:0 0 4px}
+.bk input,.bk select,.bk textarea{display:block;width:100%;margin-bottom:8px;font:inherit;padding:9px 10px;border:1px solid var(--line);border-radius:6px}
+.row3{display:grid;grid-template-columns:1.2fr 1.2fr 1fr;gap:8px}.row3 label{font-size:13px;color:#7a5d51;margin:0}
+.step{display:flex}.step button{margin:0 0 8px;background:#fff;color:var(--coal);border:1px solid var(--line);padding:0 12px}.step input{text-align:center;margin:0 4px 8px}
+@media(max-width:700px){.feature,.row3{grid-template-columns:1fr}.pbanner h1{font-size:34px}}
 button{font:inherit;padding:6px 14px;border:0;border-radius:6px;background:var(--ember);color:#fff;cursor:pointer;margin:2px}
 button:hover{background:var(--chili)}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--broth)}
 button.alt{background:#fff;color:var(--coal);border:1px solid var(--line)}
 main{max-width:1100px;margin:0 auto;padding:20px}
-.hero{background:linear-gradient(135deg,#7a1410,var(--chili));color:#fff;border-radius:12px;padding:36px 28px;margin-bottom:20px}
+.hero{background-color:#7a1410;background-image:linear-gradient(135deg,rgba(122,20,16,.88),rgba(228,87,46,.72)),var(--hero);background-size:cover;background-position:center;color:#fff;border-radius:12px;padding:64px 32px}
 .hero h1{margin:0 0 6px;font-size:34px}.hero p{margin:0;opacity:.9}
 .bar,.row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
 input,select{font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;min-width:0}
@@ -44,12 +87,15 @@ label{display:block;margin:8px 0}label input,label select{display:block;width:10
 </style>
 </head>
 <body>
+<div id="notice" class="announce" hidden><span id="nt"></span><button onclick="noticeClosed=true;this.parentNode.hidden=true" aria-label="Đóng">×</button></div>
 <header>
-  <div class="brand" onclick="start()">🍲 LauRestaurant</div>
-  <div id="nav"></div>
-  <button id="auth" onclick="authBtn()">Đăng nhập nhân viên</button>
+  <div class="brand" onclick="brand()">🍲 LauRestaurant</div>
+  <div class="hotline" id="hot"></div>
+  <nav id="nav"></nav>
+  <button id="auth" onclick="logout()" hidden>Đăng xuất</button>
 </header>
 <main id="main"></main>
+<footer id="foot"><span>© 2026 LauRestaurant</span><a onclick="authBtn()">Dành cho nhân viên</a></footer>
 <dialog id="dlg"></dialog>
 
 <script>
@@ -74,19 +120,106 @@ async function api(p, m = 'GET', b) {
   return d;
 }
 
-/* ---------- Trang chủ công khai: tìm kiếm & lọc món (PB06) ---------- */
-async function home() {
-  clearInterval(timer);
-  const cats = await api('categories');
-  $('#main').innerHTML = `<section class="hero"><h1>Lẩu nóng, quây quần</h1><p>Chọn nồi lẩu và món nhúng bạn thích.</p></section>
-    <div class="bar"><input id="q" placeholder="Tìm món ăn" oninput="loadMenu()"><select id="cat" onchange="loadMenu()"><option value="">Tất cả danh mục</option>${cats.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}</select></div>
-    <div id="grid" class="grid"></div>`;
-  loadMenu();
+/* ---------- NỘI DUNG WEBSITE: SỬA Ở ĐÂY (chữ, địa chỉ, ưu đãi, tin tức, đường dẫn ảnh) ---------- */
+const SITE = {
+  notice: 'Chào mừng đến LauRestaurant – đặt bàn online nhận ưu đãi',
+  hotline: '1900 0000',
+  hero: '/images/hero.jpg',
+  branches: [
+    { name: 'Cơ sở 1 – Ngô Quyền', addr: '123 Lạch Tray, Ngô Quyền, Hải Phòng', time: '10:00 – 22:00 hằng ngày', img: '/images/branch-1.jpg' },
+    { name: 'Cơ sở 2 – Lê Chân', addr: '45 Nguyễn Văn Linh, Lê Chân, Hải Phòng', time: '10:00 – 22:00 hằng ngày', img: '/images/branch-2.jpg' }
+  ],
+  promos: [
+    { t: 'Combo gia đình', d: 'Nồi lẩu lớn, hai đĩa thịt và rau nấm, giá trọn gói cho 4 người.', img: '/images/promo-1.jpg' },
+    { t: 'Giờ vàng 14h–17h', d: 'Giảm 15% mọi nước lẩu khi dùng bữa khung giờ chiều.', img: '/images/promo-2.jpg' },
+    { t: 'Sinh viên giảm 10%', d: 'Xuất trình thẻ sinh viên khi thanh toán.', img: '/images/promo-3.jpg' }
+  ],
+  news: [
+    { cat: 'Ưu đãi', t: 'Combo lẩu gia đình giá mới', d: 'Mùa lạnh đến, LauRestaurant ra mắt combo lẩu cho 4 người với giá dễ chịu.', img: '/images/news-1.jpg', date: '01/10/2026' },
+    { cat: 'Sự kiện', t: 'Đêm nhạc acoustic cuối tuần', d: 'Vừa nhúng lẩu vừa nghe nhạc sống vào tối thứ Bảy hằng tuần.', img: '/images/news-2.jpg', date: '28/09/2026' },
+    { cat: 'Văn hóa', t: 'Vì sao lẩu là món của sự sum họp', d: 'Một nồi lẩu nóng đặt giữa bàn, mọi người cùng nhúng, cùng chia sẻ.', img: '/images/news-3.jpg', date: '20/09/2026' }
+  ],
+  contact: { phone: '0900 000 000', email: 'lienhe@laurestaurant.vn', addr: '123 Lạch Tray, Ngô Quyền, Hải Phòng', hours: '10:00 – 22:00 hằng ngày' }
+};
+const PUB = {
+  'thuc-don': ['Thực đơn', 'Nước lẩu đậm đà, món nhúng tươi mỗi ngày, thoải mái chọn cho cả bàn.'],
+  'co-so': ['Cơ sở', 'Tìm cơ sở LauRestaurant gần bạn.'],
+  'uu-dai': ['Ưu đãi', 'Các chương trình khuyến mại đang diễn ra tại nhà hàng.'],
+  'tin-tuc': ['Tin tức', 'Cập nhật nhanh nhất sự kiện, khuyến mại và thông tin thương hiệu.'],
+  'lien-he': ['Liên hệ', 'Mọi ý kiến đóng góp của thực khách đều được tiếp nhận.']
+};
+const pic = u => u ? `<div class="pic" style="background-image:url('${u}')"></div>` : '';
+const panel = (img, t, body) => `<div class="panel">${pic(img)}<div class="body"><h3>${t}</h3><p>${body}</p></div></div>`;
+const menuImg = i => i.has_img ? `/api/menu/${i.id}/image?v=${i.img_v}` : i.image;
+let cat = '', TL = [], tabCb, noticeClosed = false;
+
+/* ---------- Thanh tab vàng dưới banner ---------- */
+function drawTabs(list, cb) { TL = list; tabCb = cb; pickTab(list[0][0]); }
+function pickTab(v) { $('#tabs').innerHTML = TL.map(([x, l]) => `<a class="${x == v ? 'on' : ''}" onclick="pickTab('${x}')">${l}</a>`).join(''); tabCb(v); }
+
+/* ---------- Điều hướng trang công khai theo #/tên-trang ---------- */
+async function route() {
+  if (me) return;
+  const k = location.hash.replace('#/', '');
+  document.querySelectorAll('#nav.pub a').forEach(a => a.classList.toggle('on', a.dataset.k === k));
+  $('#main').className = PUB[k] ? 'full' : '';
+  if (!PUB[k]) return home();
+  const [t, d] = PUB[k];
+  $('#main').innerHTML = `<div class="pbanner"><div class="inner"><div><h1>${t}</h1><p>${d}</p></div>${k === 'thuc-don' ? '<input id="q" class="search" placeholder="Tìm kiếm món ăn" oninput="loadMenu()">' : ''}</div></div><div class="tabs" id="tabs"></div><div class="inner" id="content" style="padding:28px 20px 40px"></div>`;
+  scrollTo(0, 0); await VIEWS[k]();
 }
+const VIEWS = {
+  async 'thuc-don'() {
+    const cats = await api('categories');
+    $('#content').innerHTML = '<div id="grid" class="grid"></div>';
+    drawTabs([['', 'Tất cả'], ...cats.map(c => [c.id, c.name])], v => { cat = v; loadMenu(); });
+  },
+  async 'co-so'() { $('#content').innerHTML = `<div class="grid">${SITE.branches.map(b => panel(b.img, b.name, `${b.addr}<br>${b.time}`)).join('')}</div>`; },
+  async 'uu-dai'() { $('#content').innerHTML = `<div class="grid">${SITE.promos.map(p => panel(p.img, p.t, p.d)).join('')}</div><button class="gold" onclick="bookDlg()">Đặt bàn để nhận ưu đãi</button>`; },
+  async 'tin-tuc'() {
+    $('#content').innerHTML = '<div id="news"></div>';
+    drawTabs([['', 'Tất cả'], ['Ưu đãi', 'Ưu đãi'], ['Sự kiện', 'Sự kiện'], ['Văn hóa', 'Văn hóa']], v => {
+      const L = SITE.news.filter(n => !v || n.cat === v);
+      $('#news').innerHTML = L.length ? `<div class="feature">${pic(L[0].img)}<div><small>${L[0].cat} · ${L[0].date}</small><h2>${L[0].t}</h2><p>${L[0].d}</p></div></div><div class="grid">${L.slice(1).map(n => panel(n.img, n.t, `<small>${n.cat} · ${n.date}</small><br>${n.d}`)).join('')}</div>` : '<p>Chưa có tin trong mục này.</p>';
+    });
+  },
+  async 'lien-he'() { const c = SITE.contact; $('#content').innerHTML = `<div class="grid">${panel('', 'Điện thoại', c.phone)}${panel('', 'Email', c.email)}${panel('', 'Địa chỉ', c.addr)}${panel('', 'Giờ mở cửa', c.hours)}</div>`; }
+};
 async function loadMenu() {
-  const m = await api(`menu?q=${encodeURIComponent($('#q').value)}&category=${$('#cat').value}`);
-  $('#grid').innerHTML = m.map(i => `<div class="card ${i.available ? '' : 'off'}"><b>${i.name}</b><small>${i.category_name || ''}</small><p>${i.description || ''}</p><div class="price">${money(i.price)}${i.available ? '' : ' · Hết món'}</div></div>`).join('') || '<p>Không có món nào khớp với tìm kiếm.</p>';
+  const m = await api(`menu?q=${encodeURIComponent($('#q') ? $('#q').value : '')}&category=${cat}`);
+  $('#grid').innerHTML = m.map(i => `<div class="card ${i.available ? '' : 'off'}">${pic(menuImg(i))}<b>${i.name}</b><small>${i.category_name || ''}</small><p>${i.description || ''}</p><div class="price">${money(i.price)}${i.available ? '' : ' · Hết món'}</div></div>`).join('') || '<p>Không có món nào khớp với tìm kiếm.</p>';
 }
+async function home() {
+  clearInterval(timer); $('#main').className = '';
+  $('#main').innerHTML = `<section class="hero" style="--hero:url('${SITE.hero}')"><h1>Lẩu nóng, quây quần</h1><p>Chọn nồi lẩu và món nhúng bạn thích.</p><button class="gold" onclick="bookDlg()">Đặt bàn ngay</button></section>
+    <div class="grid">${[['thuc-don', 'Thực đơn', 'Nước lẩu và món nhúng'], ['co-so', 'Cơ sở', 'Tìm nhà hàng gần bạn'], ['uu-dai', 'Ưu đãi', 'Combo và giờ vàng'], ['tin-tuc', 'Tin tức', 'Sự kiện mới nhất']].map(([k, t, d]) => `<a class="tile" href="#/${k}"><b>${t}</b>${d}</a>`).join('')}</div>`;
+}
+
+/* ---------- Đặt bàn cho khách (lưu vào Neon) ---------- */
+function bookDlg() {
+  const slots = []; for (let h = 10; h <= 21; h++) ['00', '30'].forEach(m => slots.push(`${String(h).padStart(2, '0')}:${m}`));
+  dlg.innerHTML = `<form onsubmit="return book(event)" class="bk"><h2>Đặt bàn</h2>
+    <div class="sec">Thông tin của bạn</div><input name="n" placeholder="Tên của bạn" required><input name="p" type="tel" placeholder="Số điện thoại" required>
+    <div class="sec">Thông tin đặt bàn</div>
+    <select name="b" required><option value="">Lựa chọn cơ sở</option>${SITE.branches.map(b => `<option>${b.name}</option>`).join('')}</select>
+    <div class="row3"><label>Số lượng khách<div class="step"><button type="button" onclick="stp(-1)">−</button><input id="sz" name="s" value="2" readonly><button type="button" onclick="stp(1)">+</button></div></label>
+      <label>Ngày đặt<input name="d" type="date" min="${today()}" value="${today()}" required></label>
+      <label>Giờ đến<select name="t" required><option value="">Chọn giờ</option>${slots.map(x => `<option>${x}</option>`).join('')}</select></label></div>
+    <select name="u"><option value="">Chọn ưu đãi</option>${SITE.promos.map(p => `<option>${p.t}</option>`).join('')}</select>
+    <textarea name="g" rows="3" placeholder="Ghi chú"></textarea>
+    <div class="row" style="justify-content:space-between"><button type="button" class="alt" onclick="dlg.close()">Đóng</button><button class="gold" style="margin:0">Đặt bàn ngay</button></div></form>`;
+  dlg.showModal();
+}
+const stp = d => { const e = $('#sz'); e.value = Math.min(50, Math.max(1, +e.value + d)); };
+async function book(e) {
+  e.preventDefault(); const f = e.target.elements;
+  const note = [f.b.value && 'Cơ sở: ' + f.b.value, f.u.value && 'Ưu đãi: ' + f.u.value, f.g.value].filter(Boolean).join(' | ');
+  await api('book', 'POST', { customer_name: f.n.value, phone: f.p.value, party_size: +f.s.value, reserved_at: new Date(f.d.value + 'T' + f.t.value).toISOString(), note });
+  dlg.close(); alert('Nhà hàng đã nhận yêu cầu và sẽ gọi xác nhận qua số điện thoại của bạn.'); return false;
+}
+const esc = v => String(v ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const thumb = r => r.has_img ? `<img src="/api/menu/${r.id}/image?v=${r.img_v}" style="height:42px;border-radius:4px">` : '—';
+const shrink = f => new Promise(ok => { const i = new Image(); i.onload = () => { const k = Math.min(1, 720 / Math.max(i.width, i.height)), c = document.createElement('canvas'); c.width = i.width * k; c.height = i.height * k; c.getContext('2d').drawImage(i, 0, 0, c.width, c.height); ok(c.toDataURL('image/jpeg', .75)); }; i.src = URL.createObjectURL(f); });
 
 /* ---------- Đăng nhập / điều hướng ---------- */
 function authBtn() {
@@ -101,16 +234,22 @@ async function login(e) {
   dlg.close(); start(); return false;
 }
 function logout() { localStorage.clear(); token = me = null; start(); }
+function brand() { me ? start() : (!location.hash || location.hash === '#/' ? route() : location.hash = '#/'); }
+window.onhashchange = route;
 function start() {
   clearInterval(timer);
-  $('#auth').textContent = me ? `Đăng xuất (${me.name})` : 'Đăng nhập nhân viên';
-  $('#nav').innerHTML = me ? NAV[me.role].map(k => `<a data-k="${k}" onclick="go('${k}')">${PAGE_NAME[k]}</a>`).join('') : '';
-  me ? go(NAV[me.role][0]) : home();
+  $('#auth').hidden = !me; if (me) $('#auth').textContent = `Đăng xuất (${me.name})`;
+  $('#notice').hidden = !!me || noticeClosed; $('#nt').textContent = SITE.notice;
+  $('#hot').innerHTML = me ? '' : `HOTLINE<b>${SITE.hotline}</b>`;
+  $('#nav').className = me ? '' : 'pub';
+  $('#nav').innerHTML = me ? NAV[me.role].map(k => `<a data-k="${k}" onclick="go('${k}')">${PAGE_NAME[k]}</a>`).join('')
+    : Object.entries(PUB).map(([k, v]) => `<a href="#/${k}" data-k="${k}">${v[0]}</a>`).join('') + '<button class="book" onclick="bookDlg()">Đặt bàn</button>';
+  me ? go(NAV[me.role][0]) : route();
 }
 async function go(k) {
   clearInterval(timer);
   document.querySelectorAll('#nav a').forEach(a => a.classList.toggle('on', a.dataset.k === k));
-  $('#main').innerHTML = '<div id="page"></div>';
+  $('#main').className = ''; $('#main').innerHTML = '<div id="page"></div>';
   await PAGES[k]();
 }
 
@@ -122,8 +261,8 @@ const CRUD = {
   tables: { t: 'Bàn ăn', ep: 'tables', c: [['name', 'Bàn'], ['area', 'Khu vực'], ['seats', 'Số chỗ']],
     f: [{ k: 'area_id', l: 'Khu vực', o: 'areas' }, { k: 'name', l: 'Tên bàn' }, { k: 'seats', l: 'Số chỗ', t: 'number' }] },
   cats: { t: 'Danh mục', ep: 'categories', c: [['name', 'Tên danh mục']], f: [{ k: 'name', l: 'Tên danh mục' }] },
-  menu: { t: 'Món ăn', ep: 'menu', c: [['name', 'Món'], ['category_name', 'Danh mục'], ['price', 'Giá'], ['available', 'Còn món']],
-    f: [{ k: 'category_id', l: 'Danh mục', o: 'categories' }, { k: 'name', l: 'Tên món' }, { k: 'price', l: 'Giá (đ)', t: 'number' }, { k: 'description', l: 'Mô tả' }, { k: 'available', l: 'Còn món', t: 'checkbox' }] },
+  menu: { t: 'Món ăn', ep: 'menu', c: [['has_img', 'Ảnh'], ['name', 'Món'], ['category_name', 'Danh mục'], ['price', 'Giá'], ['available', 'Còn món']],
+    f: [{ k: 'category_id', l: 'Danh mục', o: 'categories' }, { k: 'name', l: 'Tên món' }, { k: 'price', l: 'Giá (đ)', t: 'number' }, { k: 'description', l: 'Mô tả' }, { k: '_file', l: 'Ảnh món ăn (chọn từ máy, tự thu nhỏ)', t: 'file' }, { k: 'available', l: 'Còn món', t: 'checkbox' }] },
   ing: { t: 'Nguyên vật liệu', ep: 'ingredients', c: [['name', 'Tên'], ['unit', 'Đơn vị'], ['quantity', 'Tồn kho'], ['min_quantity', 'Mức cảnh báo']],
     f: [{ k: 'name', l: 'Tên' }, { k: 'unit', l: 'Đơn vị' }, { k: 'quantity', l: 'Tồn kho', t: 'number' }, { k: 'min_quantity', l: 'Mức cảnh báo hết hàng', t: 'number' }],
     extra: r => `<button class="alt" onclick="receipt(${r.id})">Nhập kho</button>` }
@@ -133,7 +272,7 @@ async function crud(key, el) {
   const c = CRUD[key], rows = await api(c.ep), canEdit = me.role === 'admin';
   DATA[key] = { rows, el };
   el.innerHTML = `<h3>${c.t} ${canEdit ? `<button onclick="edit('${key}')">+ Thêm</button>` : ''}</h3><table><tr>${c.c.map(x => `<th>${x[1]}</th>`).join('')}<th></th></tr>
-    ${rows.map(r => `<tr class="${r.min_quantity != null && +r.quantity <= +r.min_quantity ? 'low' : ''}">${c.c.map(x => `<td>${fmt(r[x[0]], x[0])}</td>`).join('')}
+    ${rows.map(r => `<tr class="${r.min_quantity != null && +r.quantity <= +r.min_quantity ? 'low' : ''}">${c.c.map(x => `<td>${x[0] === 'has_img' ? thumb(r) : fmt(r[x[0]], x[0])}</td>`).join('')}
     <td>${canEdit ? (c.extra ? c.extra(r) : '') + `<button class="alt" onclick="edit('${key}',${r.id})">Sửa</button><button class="alt" onclick="del('${key}',${r.id})">Xóa</button>` : ''}</td></tr>`).join('')}</table>`;
 }
 const reload = k => crud(k, DATA[k].el);
@@ -142,6 +281,7 @@ async function edit(key, id) {
   const fields = await Promise.all(c.f.map(async f => ({ ...f, o: typeof f.o === 'string' ? (await api(f.o)).map(x => [x.id, x.name]) : f.o })));
   dlg.innerHTML = `<form onsubmit="return save(event,'${key}',${id || 0})"><h3>${id ? 'Sửa' : 'Thêm'} ${c.t.toLowerCase()}</h3>${fields.map(f => `<label>${f.l}${
     f.o ? `<select name="${f.k}">${f.o.map(([v, l]) => `<option value="${v}" ${v == r[f.k] ? 'selected' : ''}>${l}</option>`).join('')}</select>`
+    : f.t === 'file' ? `<input type="file" name="${f.k}" accept="image/*">${r.has_img ? `<img src="/api/menu/${r.id}/image?v=${r.img_v}" style="height:70px;margin-top:6px;border-radius:6px">` : ''}`
     : f.t === 'checkbox' ? `<input type="checkbox" name="${f.k}" ${r[f.k] !== false ? 'checked' : ''}>`
     : `<input name="${f.k}" type="${f.t || 'text'}" value="${f.t === 'password' ? '' : r[f.k] ?? ''}">`}</label>`).join('')}
     <div class="row"><button>Lưu</button><button type="button" class="alt" onclick="dlg.close()">Hủy</button></div></form>`;
@@ -150,10 +290,14 @@ async function edit(key, id) {
 async function save(e, key, id) {
   e.preventDefault(); const c = CRUD[key], b = {};
   for (const f of c.f) {
+    if (f.t === 'file') continue;
     const el = e.target.elements[f.k];
     if (f.t === 'checkbox') b[f.k] = el.checked; else if (f.t === 'number') b[f.k] = +el.value; else if (el.value || f.t !== 'password') b[f.k] = el.value;
   }
-  await api(c.ep + (id ? '/' + id : ''), id ? 'PUT' : 'POST', b); dlg.close(); reload(key); return false;
+  const r = await api(c.ep + (id ? '/' + id : ''), id ? 'PUT' : 'POST', b);
+  const file = e.target.elements._file && e.target.elements._file.files[0];
+  if (file) await api(`menu/${r.id}/image`, 'PUT', { data: await shrink(file) });
+  dlg.close(); reload(key); return false;
 }
 async function del(key, id) { if (confirm('Bạn chắc chắn muốn xóa?')) { await api(CRUD[key].ep + '/' + id, 'DELETE'); reload(key); } }
 async function receipt(id) {
@@ -248,7 +392,7 @@ async function addResv() {
 }
 async function loadResv() {
   const r = await api('reservations');
-  $('#list').innerHTML = `<table><tr><th>Khách</th><th>SĐT</th><th>Số người</th><th>Giờ đặt</th><th>Cọc</th><th>Bàn</th><th>Trạng thái</th><th></th></tr>${r.map(x => `<tr><td>${x.customer_name}</td><td>${x.phone}</td><td>${x.party_size}</td><td>${new Date(x.reserved_at).toLocaleString('vi-VN')}</td><td>${money(x.deposit)}</td><td>${x.table_name || ''}</td><td>${{ booked: 'Đã đặt', arrived: 'Đã đến', cancelled: 'Đã hủy' }[x.status]}</td>
+  $('#list').innerHTML = `<table><tr><th>Khách</th><th>SĐT</th><th>Số người</th><th>Giờ đặt</th><th>Cọc</th><th>Bàn</th><th>Ghi chú</th><th>Trạng thái</th><th></th></tr>${r.map(x => `<tr><td>${esc(x.customer_name)}</td><td>${esc(x.phone)}</td><td>${x.party_size}</td><td>${new Date(x.reserved_at).toLocaleString('vi-VN')}</td><td>${money(x.deposit)}</td><td>${x.table_name || ''}</td><td>${esc(x.note)}</td><td>${{ booked: 'Đã đặt', arrived: 'Đã đến', cancelled: 'Đã hủy' }[x.status]}</td>
     <td>${x.status === 'booked' ? `<button onclick="resvStatus(${x.id},'arrived')">Khách đến</button><button class="alt" onclick="resvStatus(${x.id},'cancelled')">Hủy</button>` : ''}</td></tr>`).join('')}</table>`;
 }
 async function resvStatus(id, status) { await api(`reservations/${id}/status`, 'PUT', { status }); go('resv'); }

@@ -9,7 +9,7 @@ const Q = (text, params = []) => db.query(text, params);
 const SECRET = process.env.JWT_SECRET || 'dev-secret';
 
 const app = express();
-app.use(express.json());
+app.use(express.json({ limit: '2mb' }));
 app.use(express.static(path.join(__dirname, '../public'))); // chỉ dùng khi chạy local
 
 const wrap = fn => (req, res) => fn(req, res).catch(e => { console.error(e); res.status(500).json({ error: e.message }); });
@@ -80,11 +80,26 @@ app.put('/api/tables/:id/status', auth('waiter', 'cashier'), wrap(async (req, re
 
 // ---------- PB05, PB06: Thực đơn, tìm kiếm & lọc món ----------
 crud('categories', 'categories', ['name'], 'public', ['admin'], 'select * from categories order by id');
-crud('menu', 'menu_items', ['category_id', 'name', 'price', 'description', 'available'], null, ['admin']);
+crud('menu', 'menu_items', ['category_id', 'name', 'price', 'description', 'available', 'image'], null, ['admin']);
 app.get('/api/menu', wrap(async (req, res) => {
   const { q = '', category = '' } = req.query;
-  res.json(await Q(`select m.*, c.name category_name from menu_items m left join categories c on c.id=m.category_id
+  res.json(await Q(`select m.id,m.category_id,m.name,m.price,m.description,m.available,m.image,
+    (m.image_data is not null) has_img, coalesce(length(m.image_data),0) img_v, c.name category_name
+    from menu_items m left join categories c on c.id=m.category_id
     where m.name ilike $1 and ($2::text='' or m.category_id::text=$2::text) order by m.category_id, m.name`, [`%${q}%`, category]));
+}));
+// Ảnh món ăn lưu trong Neon (Vercel không cho ghi file)
+app.get('/api/menu/:id/image', wrap(async (req, res) => {
+  const [r] = await Q('select image_data from menu_items where id=$1', [req.params.id]);
+  const m = r && r.image_data && /^data:(image\/\w+);base64,(.+)$/.exec(r.image_data);
+  if (!m) return res.status(404).end();
+  res.set({ 'Content-Type': m[1], 'Cache-Control': 'public, max-age=31536000, immutable' }).send(Buffer.from(m[2], 'base64'));
+}));
+app.put('/api/menu/:id/image', auth('admin'), wrap(async (req, res) => {
+  const d = String(req.body.data || '');
+  if (!/^data:image\/(jpeg|png|webp);base64,/.test(d) || d.length > 1.5e6) return bad(res, 'Ảnh không hợp lệ hoặc quá lớn');
+  await Q('update menu_items set image_data=$1 where id=$2', [d, req.params.id]);
+  res.json({ ok: true });
 }));
 // Bếp bật/tắt "Hết món"
 app.put('/api/menu/:id/availability', auth('kitchen'), wrap(async (req, res) =>
@@ -188,6 +203,19 @@ app.put('/api/reservations/:id/status', auth('waiter'), wrap(async (req, res) =>
   const [r] = await Q('update reservations set status=$1 where id=$2 returning *', [req.body.status, req.params.id]);
   if (r && r.table_id) await Q("update dining_tables set status='empty' where id=$1 and status='reserved'", [r.table_id]); // khách đến/hủy → mở bàn được
   res.json(r);
+}));
+
+// Khách đặt bàn trực tiếp từ website (không cần đăng nhập)
+app.post('/api/book', wrap(async (req, res) => {
+  const { customer_name, phone, party_size, reserved_at } = req.body;
+  const name = String(customer_name || '').trim().slice(0, 80), ph = String(phone || '').replace(/[\s.-]/g, '');
+  if (!name || !/^\+?\d{9,12}$/.test(ph)) return bad(res, 'Vui lòng nhập họ tên và số điện thoại hợp lệ');
+  const when = new Date(reserved_at);
+  if (isNaN(when) || when < new Date()) return bad(res, 'Thời gian đặt bàn phải ở tương lai');
+  const [{ n }] = await Q("select count(*)::int n from reservations where phone=$1 and created_at > now() - interval '1 hour'", [ph]);
+  if (n >= 3) return bad(res, 'Bạn đã gửi quá nhiều yêu cầu, vui lòng gọi trực tiếp cho nhà hàng');
+  await Q('insert into reservations(customer_name,phone,party_size,reserved_at,note) values($1,$2,$3,$4,$5)', [name, ph, Math.min(Math.max(+party_size || 2, 1), 50), when.toISOString(), String(req.body.note || '').slice(0, 300)]);
+  res.status(201).json({ ok: true });
 }));
 
 module.exports = app;
